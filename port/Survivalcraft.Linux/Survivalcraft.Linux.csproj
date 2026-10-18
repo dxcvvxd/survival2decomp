@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>Survivalcraft</AssemblyName>
+    <RootNamespace />
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>14.0</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <NoWarn>$(NoWarn);CS0169;CS0414;CS0649;CS0162;CS0168;CS0219;CS8981;CS0108;CS0114</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- All decompiled game sources (Android-coupled files removed; see port/shims) -->
+    <Compile Include="../../decompiled/src/Survivalcraft/**/*.cs" />
+
+    <!-- Linux shims replacing the removed Android files -->
+    <Compile Include="../shims/Game/*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 23.7 MB game content pack; resource name must stay "Game.Content.pak" -->
+    <None Remove="../../decompiled/src/Survivalcraft/Game.Content.pak" />
+    <EmbeddedResource Include="../../decompiled/src/Survivalcraft/Game.Content.pak" LogicalName="Game.Content.pak" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Engine.Linux/Engine.Linux.csproj" />
+    <Reference Include="EntitySystem.Android.Net">
+      <HintPath>../lib/EntitySystem.Android.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="_Microsoft.Android.Resource.Designer">
+      <HintPath>../lib/_Microsoft.Android.Resource.Designer.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Engine</AssemblyName>
+    <RootNamespace />
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>14.0</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <!-- decompiled code: silence benign decompiler artifacts -->
+    <NoWarn>$(NoWarn);CS0169;CS0414;CS0649;CS0162;CS0168;CS0219;CS8981;CS0108;CS0114</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- All decompiled Engine sources (Android-coupled files removed; see port/shims) -->
+    <Compile Include="../../decompiled/src/Engine/**/*.cs" />
+
+    <!-- Linux shims replacing the removed Android files -->
+    <Compile Include="../shims/Engine/*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Shader/font embedded resources, names must match Engine assembly expectations.
+         WithCulture=false is required: "Lit" is a valid culture name (Lithuanian), so MSBuild
+         would otherwise emit Lit.psh/Lit.vsh into a satellite assembly instead of Engine.dll. -->
+    <EmbeddedResource Include="../../decompiled/src/Engine/Engine.Resources.Embedded.DebugFont.dat" WithCulture="false" LogicalName="Engine.Resources.Embedded.DebugFont.dat" />
+    <EmbeddedResource Include="../../decompiled/src/Engine/Engine.Resources.Embedded.Lit.psh" WithCulture="false" LogicalName="Engine.Resources.Embedded.Lit.psh" />
+    <EmbeddedResource Include="../../decompiled/src/Engine/Engine.Resources.Embedded.Lit.vsh" WithCulture="false" LogicalName="Engine.Resources.Embedded.Lit.vsh" />
+    <EmbeddedResource Include="../../decompiled/src/Engine/Engine.Resources.Embedded.Unlit.psh" WithCulture="false" LogicalName="Engine.Resources.Embedded.Unlit.psh" />
+    <EmbeddedResource Include="../../decompiled/src/Engine/Engine.Resources.Embedded.Unlit.vsh" WithCulture="false" LogicalName="Engine.Resources.Embedded.Unlit.vsh" />
+  </ItemGroup>
+
+</Project>

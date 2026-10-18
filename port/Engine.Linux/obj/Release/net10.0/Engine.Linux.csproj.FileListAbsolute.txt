@@ -1,0 +1,9 @@
+/home/dxc/github/opencode/survivalcraft/port/Engine.Linux/bin/Release/net10.0/Engine.deps.json
+/home/dxc/github/opencode/survivalcraft/port/Engine.Linux/bin/Release/net10.0/Engine.dll
+/home/dxc/github/opencode/survivalcraft/port/Engine.Linux/bin/Release/net10.0/Engine.pdb
+/home/dxc/github/opencode/survivalcraft/port/Engine.Linux/obj/Release/net10.0/Engine.Linux.GeneratedMSBuildEditorConfig.editorconfig
+/home/dxc/github/opencode/survivalcraft/port/Engine.Linux/obj/Release/net10.0/Engine.Linux.csproj.CoreCompileInputs.cache
+/home/dxc/github/opencode/survivalcraft/port/Engine.Linux/obj/Release/net10.0/Engine.dll
+/home/dxc/github/opencode/survivalcraft/port/Engine.Linux/obj/Release/net10.0/refint/Engine.dll
+/home/dxc/github/opencode/survivalcraft/port/Engine.Linux/obj/Release/net10.0/Engine.pdb
+/home/dxc/github/opencode/survivalcraft/port/Engine.Linux/obj/Release/net10.0/ref/Engine.dll
