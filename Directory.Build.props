@@ -1,0 +1,11 @@
+<Project>
+  <!-- Everything dotnet writes (obj/, bin/) goes into build/, the repository's single
+       scratch directory, next to the pipeline's own artifacts (unpacked APK,
+       extracted assemblies, logs, publish/, tmp). `make clean` and the top-level
+       ./install.sh can therefore drop all build state in one rm -rf build.
+       MSBuildProjectName keeps the two projects' intermediate files separate. -->
+  <PropertyGroup>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)build/obj/$(MSBuildProjectName)/</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(MSBuildThisFileDirectory)build/bin/$(MSBuildProjectName)/</BaseOutputPath>
+  </PropertyGroup>
+</Project>

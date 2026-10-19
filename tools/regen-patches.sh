@@ -20,6 +20,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=tools/lib.sh
 . "$REPO_ROOT/tools/lib.sh"
+use_build_tmpdir
 
 WORK="$REPO_ROOT/build/pristine"
 PRISTINE=""

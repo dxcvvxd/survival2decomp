@@ -8,7 +8,7 @@
 # Environment:
 #   PREFIX       install root for binary + app files
 #                (default: ~/.local as user, /usr/local as root/sudo)
-#   PUBLISH_DIR  dotnet publish output (default: <repo>/publish)
+#   PUBLISH_DIR  dotnet publish output (default: <repo>/build/publish)
 #   APP_HOME     config/data dir (default: $XDG_CONFIG_HOME/survivalcraft2
 #                or ~/.config/survivalcraft2) — settings, worlds, logs,
 #                texture/furniture packs, downloaded content
@@ -42,7 +42,7 @@ if [ -z "${PREFIX:-}" ]; then
         PREFIX="$HOME_DIR/.local"
     fi
 fi
-PUBLISH_DIR=${PUBLISH_DIR:-"$REPO_DIR/publish"}
+PUBLISH_DIR=${PUBLISH_DIR:-"$REPO_DIR/build/publish"}
 XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-"$HOME_DIR/.config"}
 APP_HOME=${APP_HOME:-"$XDG_CONFIG_HOME/survivalcraft2"}
 

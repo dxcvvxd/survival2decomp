@@ -7,35 +7,51 @@ audio device handling) is replaced by Linux implementations. The result is built
 the .NET SDK and runs on GLFW + OpenGL ES + OpenAL.
 
 ```
-compile                 APK -> decompiled + patched + buildable tree (one command)
-Makefile                make / make install / make uninstall / make clean / make distclean
+install.sh                ./install.sh <apk> — APK -> built, installed, build/ dropped
+compile                   APK -> decompiled + patched + buildable tree (one command)
+Makefile                  make / make install / make uninstall / make clean / make distclean
+Directory.Build.props     sends every dotnet obj/bin into build/
 port/
-  Engine.Linux/         project that builds Engine.dll
-  Survivalcraft.Linux/  project that builds the game executable
-  shims/                hand-written Linux replacements for the Android layer
-  lib/                  APK-extracted managed assemblies (generated, not tracked)
-patches/                the port itself, as patch stages (see patches/README.md)
-tools/                  assembly-store extractor, patch regeneration, stage toggles
-install/                installer script (+ the icon, taken from the APK)
+  Engine.Linux/           project that builds Engine.dll
+  Survivalcraft.Linux/    project that builds the game executable
+  shims/                  hand-written Linux replacements for the Android layer
+  lib/                    APK-extracted managed assemblies (generated, not tracked)
+patches/                  the port itself, as patch stages (see patches/README.md)
+tools/                    assembly-store extractor, patch regeneration, stage toggles
+install/                  install.sh machinery for make install (+ APK icon)
+build/                    the one scratch directory (gitignored, generated)
 ```
 
 Nothing from the game is stored here: `compile` pulls the managed assemblies out
 of the APK you pass, decompiles them, applies `patches/` and builds. `decompiled/`,
 `port/lib/`, `install/survivalcraft2.png` and `build/` are generated and ignored.
 
+`build/` holds every build artifact of a run — the unpacked APK, the extracted
+assemblies, decompiler/extractor logs, `obj/`, `bin/`, `publish/` and `tmp/`
+(TMPDIR for the whole build, so nothing is written to `/tmp`). `make clean` is a
+single `rm -rf build`.
+
 ## Building and installing
 
 ```sh
-./compile <apk>           # decompile + patch + build the tree from the APK (do this first)
-make                     # build (dotnet build)
+./install.sh <apk>        # APK -> compiled, built, installed, build/ removed (do this first)
+make                     # rebuild (dotnet build) from the already-existing tree
 sudo make install        # publish + install binary, app files, desktop shortcut, icon
 sudo make uninstall      # remove everything that was installed
-make clean               # drop build outputs and the pipeline work dir
+make clean               # drop the build directory (all build artifacts)
 make distclean           # also drop everything generated from the APK (patcher-only tree)
 ```
 
-`make` alone needs a tree from a previous `./compile <apk>` (it says so if there
-is none).
+`./install.sh` is the one-shot: it runs `./compile <apk>` (decompile + patch +
+build) and `make install`, then deletes `build/`. It elevates through `$SUDO`
+(default `sudo`) so the app lands in `/usr/local`; with `SUDO=` (or no sudo) it
+installs user-level into `~/.local`. The APK is only read — it stays wherever you
+put it, and `decompiled/` + `port/lib` stay in the tree so `make` keeps working
+(`make distclean` drops them too). Nothing is deleted if a step fails, so `build/`
+survives for inspection.
+
+`make` alone needs a tree from a previous `./install.sh <apk>` or `./compile <apk>`
+(it says so if there is none).
 
 `make install` does the whole job itself: it publishes, copies the app to
 `$PREFIX/lib/survivalcraft2`, writes the launcher to `$PREFIX/bin/survivalcraft2`,

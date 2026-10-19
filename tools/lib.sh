@@ -43,6 +43,14 @@ ensure_ilspycmd() {
 	fi
 }
 
+# Directories a script's own scratch needs live in the build directory, never in
+# the system temp dir: build/ is the repository's single scratch root and is
+# dropped as a whole (make clean / ./install.sh after a successful install).
+use_build_tmpdir() {
+	mkdir -p "$REPO_ROOT/build/tmp"
+	export TMPDIR="$REPO_ROOT/build/tmp"
+}
+
 # extract_assemblies <apk | unpacked-apk-dir | libassemblies.so> <workdir>
 # Unpacks the input and extracts the managed assemblies from the .NET Android
 # assembly store into <workdir>/assemblies (plus <workdir>/apk for app resources).

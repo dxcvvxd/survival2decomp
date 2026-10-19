@@ -94,9 +94,13 @@ done
 
 require_cmd dotnet
 require_cmd patch
+
+# the whole run (unpack, decompile, dotnet, patch) uses build/tmp, never /tmp
+[ "$KEEP_WORK" = 1 ] || rm -rf "$WORK"
+use_build_tmpdir
+
 ensure_ilspycmd
 
-[ "$KEEP_WORK" = 1 ] || rm -rf "$WORK"
 mkdir -p "$WORK"
 
 # ---------------------------------------------------------------- 1. unpack/extract
