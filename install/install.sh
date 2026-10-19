@@ -140,7 +140,6 @@ EOF
     mkdir -p "$DESKTOP_DIR"
     cat > "$DESKTOP_FILE" <<EOF
 [Desktop Entry]
-Version=1.0
 Type=Application
 Name=Survivalcraft 2
 GenericName=Sandbox Survival Game
@@ -150,7 +149,6 @@ Icon=survivalcraft2
 Terminal=false
 Categories=Game;AdventureGame;
 Keywords=survival;craft;sandbox;game;
-StartupNotify=true
 EOF
     chmod 644 "$DESKTOP_FILE"
     if command -v desktop-file-validate >/dev/null 2>&1; then
