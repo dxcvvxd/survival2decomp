@@ -2,9 +2,9 @@
 #
 # Survivalcraft 2 - turn an Android APK into a buildable Linux desktop build.
 #
-#   ./compile <survivalcraft.apk>           1:1 port, decompile + patch + build
-#   ./compile <apk> --fixes                 ... plus the desktop behaviour fixes
-#   ./compile <apk> --install               ... and install it (make install)
+#   ./compile.sh <survivalcraft.apk>           1:1 port, decompile + patch + build
+#   ./compile.sh <apk> --fixes                 ... plus the desktop behaviour fixes
+#   ./compile.sh <apk> --install               ... and install it (make install)
 #
 # The Android app is a .NET (Xamarin/Mono) application, so the port is:
 #

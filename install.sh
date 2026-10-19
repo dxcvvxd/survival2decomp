@@ -8,10 +8,10 @@
 #   ./install.sh <apk> --stage <name>           ... plus an extra patch stage
 #   ./install.sh <apk> --keep-build             keep build/ afterwards (debugging)
 #
-# Steps (./compile validates the input: .apk, an unpacked APK directory, or
+# Steps (./compile.sh validates the input: .apk, an unpacked APK directory, or
 # libassemblies.<abi>.blob.so):
 #
-#   1. ./compile <apk>   unpack + extract assemblies + decompile + apply the
+#   1. ./compile.sh <apk>   unpack + extract assemblies + decompile + apply the
 #                        patch stages + build
 #   2. make install      publish + launcher + app files + desktop entry + icon +
 #                        config dir - system-wide through $SUDO (default: sudo),
@@ -46,7 +46,7 @@ while [ $# -gt 0 ]; do
 	case "$1" in
 	-k | --keep-build) KEEP_BUILD=1 ;;
 	-h | --help) usage 0 ;;
-	*) ARGS+=("$1") ;; # ./compile arguments: APK path, --fixes, --stage NAME
+	*) ARGS+=("$1") ;; # ./compile.sh arguments: APK path, --fixes, --stage NAME
 	esac
 	shift
 done
@@ -55,7 +55,7 @@ done
 [ -e "${ARGS[0]}" ] || die "input not found: ${ARGS[0]}"
 
 info "1/3: decompile + patch + build"
-"$REPO_ROOT/compile" "${ARGS[@]}"
+"$REPO_ROOT/compile.sh" "${ARGS[@]}"
 
 info "2/3: install"
 if [ "$(id -u)" = 0 ]; then

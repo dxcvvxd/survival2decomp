@@ -8,7 +8,7 @@ the .NET SDK and runs on GLFW + OpenGL ES + OpenAL.
 
 ```
 install.sh                ./install.sh <apk> — APK -> built, installed, build/ dropped
-compile                   APK -> decompiled + patched + buildable tree (one command)
+compile.sh              APK -> decompiled + patched + buildable tree (one command)
 Makefile                  make / make install / make uninstall / make clean / make distclean
 Directory.Build.props     sends every dotnet obj/bin into build/
 port/
@@ -22,7 +22,7 @@ install/                  install.sh machinery for make install (+ APK icon)
 build/                    the one scratch directory (gitignored, generated)
 ```
 
-Nothing from the game is stored here: `compile` pulls the managed assemblies out
+Nothing from the game is stored here: `compile.sh` pulls the managed assemblies out
 of the APK you pass, decompiles them, applies `patches/` and builds. `decompiled/`,
 `port/lib/`, `install/survivalcraft2.png` and `build/` are generated and ignored.
 
@@ -42,7 +42,7 @@ make clean               # drop the build directory (all build artifacts)
 make distclean           # also drop everything generated from the APK (patcher-only tree)
 ```
 
-`./install.sh` is the one-shot: it runs `./compile <apk>` (decompile + patch +
+`./install.sh` is the one-shot: it runs `./compile.sh <apk>` (decompile + patch +
 build) and `make install`, then deletes `build/`. It elevates through `$SUDO`
 (default `sudo`) so the app lands in `/usr/local`; with `SUDO=` (or no sudo) it
 installs user-level into `~/.local`. The APK is only read — it stays wherever you
@@ -50,7 +50,7 @@ put it, and `decompiled/` + `port/lib` stay in the tree so `make` keeps working
 (`make distclean` drops them too). Nothing is deleted if a step fails, so `build/`
 survives for inspection.
 
-`make` alone needs a tree from a previous `./install.sh <apk>` or `./compile <apk>`
+`make` alone needs a tree from a previous `./install.sh <apk>` or `./compile.sh <apk>`
 (it says so if there is none).
 
 `make install` does the whole job itself: it publishes, copies the app to
@@ -70,7 +70,7 @@ Android-era data directories are migrated there if they were left in the tree.
 ### Requirements
 
 * build: .NET SDK 10, `make`, `patch`, `python3`, `unzip`
-* only for re-deriving from an APK: `ilspycmd` 11.0.0.9375 (`./compile` installs it
+* only for re-deriving from an APK: `ilspycmd` 11.0.0.9375 (`./compile.sh` installs it
   as a global dotnet tool if missing)
 * runtime: `libglfw.so.3`, `libGLESv2.so.2` (Mesa), `libopenal.so.1`, and the
   unversioned `libglfw.so` / `libGLESv2.so` / `libopenal.so` symlinks that come
@@ -80,13 +80,13 @@ Android-era data directories are migrated there if they were left in the tree.
 ## Re-deriving from the original APK
 
 ```sh
-./compile /path/to/Survivalcraft-2-...-full-apkvision.apk     # 1:1 port, then build
-./compile <apk> --fixes                                      # ... plus the behaviour fixes
-./compile <apk> --fixes --install                            # ... and install it
+./compile.sh /path/to/Survivalcraft-2-...-full-apkvision.apk     # 1:1 port, then build
+./compile.sh <apk> --fixes                                      # ... plus the behaviour fixes
+./compile.sh <apk> --fixes --install                            # ... and install it
 make from-apk APK=<apk> [ARGS=--fixes]                       # same, via make
 ```
 
-`./compile` unpacks the APK, extracts the managed assemblies from the .NET Android
+`./compile.sh` unpacks the APK, extracts the managed assemblies from the .NET Android
 assembly store (`libassemblies.<abi>.blob.so`, `XABA`/`XALZ` + LZ4), decompiles
 `Engine.dll` and `Survivalcraft.dll` with ilspycmd, applies the patch stages, takes
 the launcher icon from the APK and builds. The decompiler output is
@@ -113,7 +113,7 @@ clean).
 	| `Game/WebManager.cs` | drops `Android.Net`; reports "online" instead of asking `ConnectivityManager` |
 
 **`patches/fixes` — optional desktop behaviour, on top of the 1:1 port.** Not part of
-	`./compile` unless `--fixes` is given, and toggled in an existing tree with
+	`./compile.sh` unless `--fixes` is given, and toggled in an existing tree with
 	`make fixes` / `make unfixes`:
 
 	| patch | why |
@@ -144,7 +144,7 @@ APK does not contain.
 
 ## Notes and known gaps
 
-* `port/lib` and `install/survivalcraft2.png` are produced by `./compile`: the two
+* `port/lib` and `install/survivalcraft2.png` are produced by `./compile.sh`: the two
   managed assemblies the game links against (`EntitySystem.Android.Net.dll` and
   `_Microsoft.Android.Resource.Designer.dll`, the latter replacing the deleted
   `Resource.cs`) plus the launcher icon are taken straight out of the APK, because

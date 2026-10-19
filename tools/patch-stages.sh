@@ -7,7 +7,7 @@
 #   tools/patch-stages.sh apply fixes
 #   tools/patch-stages.sh revert fixes
 #
-# File removals (patches/<stage>/removed-files.txt) are only performed by ./compile
+# File removals (patches/<stage>/removed-files.txt) are only performed by ./compile.sh
 # on a fresh decompile; a stage applied here must only contain .patch files.
 #
 set -euo pipefail
@@ -36,7 +36,7 @@ for s in "$@"; do
 	dir="$(stage_dir "$s")"
 	[ -d "$dir" ] || die "unknown stage: $s (available: $(list_stages | tr '\n' ' '))"
 	if [ -f "$dir/removed-files.txt" ]; then
-		warn "stage $s deletes files; those removals only happen during ./compile (skipped here)"
+		warn "stage $s deletes files; those removals only happen during ./compile.sh (skipped here)"
 	fi
 	case "$ACTION" in
 	apply) apply_stage_patches "$dir" ;;

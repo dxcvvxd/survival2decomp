@@ -1,6 +1,6 @@
 # shellcheck shell=bash
 # Shared helpers for the Survivalcraft 2 -> Linux desktop port tooling.
-# Sourced by ./compile, tools/regen-patches.sh and tools/patch-stages.sh
+# Sourced by ./compile.sh, tools/regen-patches.sh and tools/patch-stages.sh
 # (all of which set REPO_ROOT first).
 
 # ilspycmd version the checked-in patches were generated against. The decompiler
