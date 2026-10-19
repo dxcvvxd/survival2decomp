@@ -1,0 +1,15 @@
+# ExternalContentManager: do not register the Android SD-card content provider.
+#
+# AndroidSdCardExternalContentProvider is deleted with the rest of the Android
+# layer (it uses Android.Net/JAVA storage APIs). Only Dropbox remains.
+#
+--- a/decompiled/src/Survivalcraft/Game/ExternalContentManager.cs
++++ b/decompiled/src/Survivalcraft/Game/ExternalContentManager.cs
+@@ -28,7 +28,6 @@
+ 	public static void Initialize()
+ 	{
+ 		m_providers = new List<IExternalContentProvider>();
+-		m_providers.Add(new AndroidSdCardExternalContentProvider());
+ 		m_providers.Add(new DropboxExternalContentProvider());
+ 	}
+ 

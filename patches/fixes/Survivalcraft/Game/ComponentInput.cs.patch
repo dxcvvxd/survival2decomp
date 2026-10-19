@@ -1,0 +1,21 @@
+# ComponentInput: the player is not "controlled by touch" until a real touch arrives.
+#
+# Upstream defaults IsControlledByTouch to true until the first touch event.
+# On a desktop with no touch hardware every touch-derived behaviour applied
+# permanently: mobile move/look pads stayed on screen and the crosshair and the
+# aiming sights were suppressed. Default to mouse/keyboard instead.
+#
+--- a/decompiled/src/Survivalcraft/Game/ComponentInput.cs
++++ b/decompiled/src/Survivalcraft/Game/ComponentInput.cs
+@@ -27,7 +27,10 @@
+ 
+ 	public PlayerInput PlayerInput => m_playerInput;
+ 
+-	public bool IsControlledByTouch { get; private set; } = true;
++	// Linux desktop port: no touch hardware, so the player is never "controlled by touch"
++	// until a real touch arrives. The original default (true) would show the mobile
++	// move/look pads and hide the crosshair until the mouse was first moved.
++	public bool IsControlledByTouch { get; private set; }
+ 
+ 	public bool IsControlledByVr
+ 	{

@@ -1,0 +1,40 @@
+# ContentCache: tolerate assemblies whose references cannot be resolved.
+#
+# The type scan behind ContentManager used Assembly.DefinedTypes, which throws
+# ReflectionTypeLoadException when any dependency is missing. On this build the
+# game loads alongside Android-era managed assemblies, so startup died in
+# ModelWidget. Scan whatever types did load and warn instead.
+#
+--- a/decompiled/src/Engine/Engine.Content/ContentCache.cs
++++ b/decompiled/src/Engine/Engine.Content/ContentCache.cs
+@@ -350,7 +350,7 @@
+ 			{
+ 				continue;
+ 			}
+-			foreach (TypeInfo definedType in item.DefinedTypes)
++			foreach (TypeInfo definedType in GetLoadableTypes(item))
+ 			{
+ 				ContentReaderAttribute customAttribute = definedType.GetCustomAttribute<ContentReaderAttribute>();
+ 				if (customAttribute != null && !m_contentReadersByTypeName.ContainsKey(customAttribute.ContentTypeName))
+@@ -376,4 +376,21 @@
+ 			}
+ 		}
+ 	}
++
++	/// <summary>
++	/// Assemblies with optional/unresolvable references (e.g. Android-era dependencies)
++	/// throw ReflectionTypeLoadException from DefinedTypes; use whatever types did load.
++	/// </summary>
++	private static IEnumerable<TypeInfo> GetLoadableTypes(Assembly assembly)
++	{
++		try
++		{
++			return assembly.DefinedTypes;
++		}
++		catch (ReflectionTypeLoadException ex)
++		{
++			Log.Warning($"Could not fully load types of assembly \"{assembly.GetName().Name}\". Reason: {ex.Message}");
++			return ex.Types.Where((Type t) => t != null).Select((Type t) => t.GetTypeInfo());
++		}
++	}
+ }

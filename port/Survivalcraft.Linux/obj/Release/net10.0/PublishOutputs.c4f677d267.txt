@@ -1,9 +1,0 @@
-/home/dxc/github/opencode/survivalcraft/publish/Survivalcraft
-/home/dxc/github/opencode/survivalcraft/publish/Survivalcraft.dll
-/home/dxc/github/opencode/survivalcraft/publish/Survivalcraft.deps.json
-/home/dxc/github/opencode/survivalcraft/publish/Survivalcraft.runtimeconfig.json
-/home/dxc/github/opencode/survivalcraft/publish/Survivalcraft.pdb
-/home/dxc/github/opencode/survivalcraft/publish/Engine.dll
-/home/dxc/github/opencode/survivalcraft/publish/EntitySystem.Android.Net.dll
-/home/dxc/github/opencode/survivalcraft/publish/_Microsoft.Android.Resource.Designer.dll
-/home/dxc/github/opencode/survivalcraft/publish/Engine.pdb

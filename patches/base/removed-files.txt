@@ -1,0 +1,23 @@
+# Source files deleted from the decompiled tree by the Linux port.
+# One path per line, relative to decompiled/src. Everything after '#' is a comment.
+# These are the Android-coupled implementations; the replacements live in port/shims.
+
+# ---- Engine ----
+Engine/Engine/Window.cs                       # replaced by port/shims/Engine/WindowLinux.cs (GLFW window/game loop)
+Engine/Engine/EngineActivity.cs               # Android activity hosting the view
+Engine/Engine/EngineView.cs                   # Android GLSurfaceView (OpenGL ES surface + touch events)
+Engine/Engine/Storage.cs                      # Android app-storage paths; see port/shims/Engine/StorageLinux.cs / SURVIVALCRAFT2_HOME
+Engine/Engine/Utilities.cs                    # Android notifications/dialogs/screen helpers
+Engine/Engine/Resource.cs                     # Android resource designer access (uses _Microsoft.Android.Resource.Designer.dll instead)
+Engine/Engine.Input/Mouse.cs                  # replaced by port/shims/Engine/MouseLinux.cs (GLFW cursor)
+Engine/Engine.Input/Keyboard.cs               # replaced by port/shims/Engine/KeyboardLinux.cs (GLFW keys)
+Engine/Engine.Input/GamePad.cs                # replaced by port/shims/Engine/GamePadLinux.cs (GLFW joysticks)
+Engine/Engine.Input/Touch.cs                  # replaced by port/shims/Engine/TouchLinux.cs (no touch hardware)
+
+# ---- Survivalcraft ----
+Survivalcraft/Game/Resource.cs                # Android resource designer access
+Survivalcraft/Game/DeviceManager.cs           # Android device/vibrate/status-bar integration; see port/shims/Game/DeviceManagerLinux.cs
+Survivalcraft/Game/ScreenResolutionManager.cs # Android display-mode/immersive control; see port/shims/Game/ScreenResolutionManagerLinux.cs
+Survivalcraft/Game/ScreenCaptureManager.cs    # Android MediaStore screenshots; see port/shims/Game/ScreenCaptureManagerLinux.cs
+Survivalcraft/Game/WebBrowserManager.cs       # Android browser Intent; see port/shims/Game/WebBrowserManagerLinux.cs
+Survivalcraft/Game/AndroidSdCardExternalContentProvider.cs  # Android SD-card content provider (ExternalContentManager patch drops it)

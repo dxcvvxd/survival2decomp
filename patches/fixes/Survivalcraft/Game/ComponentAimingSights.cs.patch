@@ -1,0 +1,34 @@
+# ComponentAimingSights: desktop crosshair instead of the mobile aiming "sights".
+#
+# While aiming (throwables, bow, crossbow, musket) the game draws
+# Textures/Gui/Sights as a world-space quad placed from the aim ray that
+# ComponentInput captured early in the frame, i.e. before the camera applied
+# that frame's rotation. With a mouse the reticle therefore wobbles relative to
+# the view while turning. With mouse/keyboard input keep the plain crosshair
+# (also no longer suppressed while aiming) and leave the sights to touch input.
+#
+--- a/decompiled/src/Survivalcraft/Game/ComponentAimingSights.cs
++++ b/decompiled/src/Survivalcraft/Game/ComponentAimingSights.cs
+@@ -45,7 +45,11 @@
+ 		}
+ 		if (m_componentPlayer.ComponentHealth.Health > 0f && m_componentPlayer.ComponentGui.ControlsContainerWidget.IsVisible)
+ 		{
+-			if (IsSightsVisible)
++			// Linux desktop port: the aiming "sights" sprite is a mobile affordance. It is
++			// placed in world space from the aim ray captured early in the frame (before the
++			// camera applies this frame's rotation), so it wobbles relative to the view while
++			// turning. With mouse/keyboard input the plain crosshair below is used instead.
++			if (IsSightsVisible && m_componentPlayer.ComponentInput.IsControlledByTouch)
+ 			{
+ 				Texture2D texture = ContentManager.Get<Texture2D>("Textures/Gui/Sights");
+ 				float num = ((!camera.Eye.HasValue) ? 8f : 2.5f);
+@@ -61,7 +65,8 @@
+ 				texturedBatch3D.QueueQuad(p, p2, p3, p4, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(0f, 1f), Color.White);
+ 				texturedBatch3D.TransformTriangles(camera.ViewMatrix, count);
+ 			}
+-			if (!camera.Eye.HasValue && !camera.UsesMovementControls && !IsSightsVisible && (SettingsManager.LookControlMode == LookControlMode.SplitTouch || !m_componentPlayer.ComponentInput.IsControlledByTouch))
++			// Linux desktop port: the crosshair is no longer suppressed while aiming (see above).
++			if (!camera.Eye.HasValue && !camera.UsesMovementControls && (SettingsManager.LookControlMode == LookControlMode.SplitTouch || !m_componentPlayer.ComponentInput.IsControlledByTouch))
+ 			{
+ 				Subtexture subtexture = ContentManager.Get<Subtexture>("Textures/Atlas/Crosshair");
+ 				float num2 = 1.25f;

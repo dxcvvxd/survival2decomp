@@ -1,0 +1,35 @@
+# HumanReadableConverter: tolerate assemblies whose references cannot be resolved.
+#
+# Same cause as the ContentCache patch: HumanReadableConverter.Convert scans all
+# loaded assemblies and crashed on ReflectionTypeLoadException for the
+# Android-era assemblies that ship with this build.
+#
+--- a/decompiled/src/Engine/Engine.Serialization/HumanReadableConverter.cs
++++ b/decompiled/src/Engine/Engine.Serialization/HumanReadableConverter.cs
+@@ -147,7 +147,7 @@
+ 			{
+ 				continue;
+ 			}
+-			foreach (TypeInfo definedType in item.DefinedTypes)
++			foreach (TypeInfo definedType in GetLoadableTypes(item))
+ 			{
+ 				HumanReadableConverterAttribute customAttribute = definedType.GetCustomAttribute<HumanReadableConverterAttribute>();
+ 				if (customAttribute == null)
+@@ -167,4 +167,17 @@
+ 			m_scannedAssemblies.Add(item);
+ 		}
+ 	}
++
++	private static IEnumerable<TypeInfo> GetLoadableTypes(Assembly assembly)
++	{
++		try
++		{
++			return assembly.DefinedTypes;
++		}
++		catch (ReflectionTypeLoadException ex)
++		{
++			Log.Warning($"Could not fully load types of assembly \"{assembly.GetName().Name}\". Reason: {ex.Message}");
++			return ex.Types.Where((Type t) => t != null).Select((Type t) => t.GetTypeInfo());
++		}
++	}
+ }

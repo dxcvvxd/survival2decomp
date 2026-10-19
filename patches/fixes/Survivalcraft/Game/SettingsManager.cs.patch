@@ -1,0 +1,34 @@
+# SettingsManager: persist enum settings.
+#
+# HumanReadableConverter has no converter for enum types, so saving an enum
+# setting threw (and loading silently dropped it) for Creative -> CommunityContent
+# Mode / ScreenLayout1..4. Parse/format enums directly in SettingsManager rather
+# than teaching HumanReadableConverter about enums, which would change the
+# archive/save-file format.
+#
+--- a/decompiled/src/Survivalcraft/Game/SettingsManager.cs
++++ b/decompiled/src/Survivalcraft/Game/SettingsManager.cs
+@@ -304,7 +304,10 @@
+ 							select pi).FirstOrDefault();
+ 						if (propertyInfo != null)
+ 						{
+-							object value = HumanReadableConverter.ConvertFromString(propertyInfo.PropertyType, attributeValue);
++							// enums have no HumanReadableConverter (upstream quirk); parse them directly
++							object value = (propertyInfo.PropertyType.GetTypeInfo().IsEnum
++								? Enum.Parse(propertyInfo.PropertyType, attributeValue)
++								: HumanReadableConverter.ConvertFromString(propertyInfo.PropertyType, attributeValue));
+ 							propertyInfo.SetValue(null, value, null);
+ 						}
+ 					}
+@@ -333,7 +336,10 @@
+ 			{
+ 				try
+ 				{
+-					string value = HumanReadableConverter.ConvertToString(item.GetValue(null, null));
++					object value2 = item.GetValue(null, null);
++					string value = ((value2 != null && item.PropertyType.GetTypeInfo().IsEnum)
++						? value2.ToString()
++						: HumanReadableConverter.ConvertToString(value2));
+ 					XElement node = XmlUtils.AddElement(xElement, "Setting");
+ 					XmlUtils.SetAttributeValue(node, "Name", item.Name);
+ 					XmlUtils.SetAttributeValue(node, "Value", value);

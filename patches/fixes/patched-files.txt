@@ -1,0 +1,3 @@
+Survivalcraft/Game/ComponentAimingSights.cs
+Survivalcraft/Game/ComponentInput.cs
+Survivalcraft/Game/SettingsManager.cs

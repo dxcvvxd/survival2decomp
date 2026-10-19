@@ -1,0 +1,151 @@
+#!/usr/bin/env bash
+#
+# Survivalcraft 2 - turn an Android APK into a buildable Linux desktop build.
+#
+#   ./compile <survivalcraft.apk>           1:1 port, decompile + patch + build
+#   ./compile <apk> --fixes                 ... plus the desktop behaviour fixes
+#   ./compile <apk> --install               ... and install it (make install)
+#
+# The Android app is a .NET (Xamarin/Mono) application, so the port is:
+#
+#   1. unpack the APK and pull the managed assemblies out of the .NET Android
+#      assembly store (libassemblies.<abi>.blob.so, XABA/XALZ + LZ4)
+#   2. decompile Engine.dll and Survivalcraft.dll back to C# (ilspycmd), and take
+#      the prebuilt managed assemblies the game links against plus the launcher
+#      icon out of the APK (nothing derived from the APK lives in the repository)
+#   3. apply the "base" patch stage (patches/base): delete the Android-coupled
+#      sources and make the remaining code compile and run against the Linux
+#      shims in port/shims - no gameplay/behaviour changes
+#   4. apply any requested extra stages (patches/fixes: crosshair, controls,
+#      settings) on top of that
+#   5. build it (make build)
+#
+# By default the tree (and therefore the build) is 1:1 with the APK's game code;
+# only the platform layer differs. Behaviour fixes are separate patches so they
+# can be selected, dropped or extended without touching the base port.
+#
+# Options:
+#   -f, --fixes        also apply the "fixes" stage (desktop behaviour fixes)
+#       --stage NAME   also apply stage patches/NAME (repeatable; base is implicit)
+#   -i, --install      run `make install` after a successful build
+#   -n, --no-build     stop after patching (do not build)
+#   -k, --keep-work    keep build/ (unpacked APK + extracted assemblies + logs)
+#   -h, --help         show this help
+#
+# The input may be:
+#   - a .apk file
+#   - a directory of an already unpacked APK (containing lib/ and res/)
+#   - a libassemblies.<abi>.blob.so directly
+#
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=tools/lib.sh
+. "$REPO_ROOT/tools/lib.sh"
+
+WORK="$REPO_ROOT/build"
+SRC="$REPO_ROOT/decompiled/src"
+
+INSTALL=0
+BUILD=1
+KEEP_WORK=0
+INPUT=""
+STAGES="$BASE_STAGE"
+
+add_stage() {
+	case " $STAGES " in
+	*" $1 "*) ;;
+	*) STAGES="$STAGES $1" ;;
+	esac
+}
+
+usage() {
+	awk 'NR>2 { if ($0 !~ /^#/) exit; sub(/^# ?/, ""); print }' "${BASH_SOURCE[0]}"
+	exit "${1:-0}"
+}
+
+while [ $# -gt 0 ]; do
+	case "$1" in
+	-f | --fixes) add_stage fixes ;;
+	--stage)
+		[ -n "${2:-}" ] || die "--stage needs a stage name (available: $(list_stages | tr '\n' ' '))"
+		add_stage "$2"
+		shift
+		;;
+	-i | --install) INSTALL=1 ;;
+	-n | --no-build) BUILD=0 ;;
+	-k | --keep-work) KEEP_WORK=1 ;;
+	-h | --help) usage 0 ;;
+	-*) die "unknown option: $1 (try --help)" ;;
+	*)
+		[ -z "$INPUT" ] || die "only one input path is supported"
+		INPUT="$1"
+		;;
+	esac
+	shift
+done
+
+[ -n "$INPUT" ] || usage 1
+[ -e "$INPUT" ] || die "input not found: $INPUT"
+INPUT="$(readlink -f "$INPUT")"
+for s in $STAGES; do
+	[ -d "$(stage_dir "$s")" ] || die "unknown stage: $s (available: $(list_stages | tr '\n' ' '))"
+done
+
+require_cmd dotnet
+require_cmd patch
+ensure_ilspycmd
+
+[ "$KEEP_WORK" = 1 ] || rm -rf "$WORK"
+mkdir -p "$WORK"
+
+# ---------------------------------------------------------------- 1. unpack/extract
+extract_assemblies "$INPUT" "$WORK"
+
+# ---------------------------------------------------------------- 2. decompile
+rm -rf "$SRC/Engine" "$SRC/Survivalcraft"
+decompile_project "$WORK/assemblies" Engine.dll "$SRC/Engine" "$WORK"
+decompile_project "$WORK/assemblies" Survivalcraft.dll "$SRC/Survivalcraft" "$WORK"
+materialize_support_assemblies "$WORK/assemblies" "$REPO_ROOT/port/lib"
+extract_icon "$WORK/apk" "$REPO_ROOT/install/survivalcraft2.png"
+
+# ---------------------------------------------------------------- 3./4. patch stages
+info "patch stages: $STAGES"
+for s in $STAGES; do
+	apply_stage_removals "$(stage_dir "$s")"
+	apply_stage_patches "$(stage_dir "$s")"
+done
+
+# sanity: the files the build absolutely needs
+for f in \
+	"$SRC/Survivalcraft/Game.Content.pak" \
+	"$SRC/Engine/Engine.Resources.Embedded.Lit.psh" \
+	"$REPO_ROOT/port/lib/EntitySystem.Android.Net.dll" \
+	"$REPO_ROOT/port/lib/_Microsoft.Android.Resource.Designer.dll"; do
+	[ -e "$f" ] || die "missing required file after patching: ${f#"$REPO_ROOT"/}"
+done
+for f in "$REPO_ROOT"/port/shims/*/*.cs; do
+	[ -e "$f" ] || die "no Linux shims found in port/shims"
+	break
+done
+
+# ---------------------------------------------------------------- 5. build
+if [ "$BUILD" = 1 ]; then
+	info "building"
+	(cd "$REPO_ROOT" && make build)
+fi
+
+if [ "$INSTALL" = 1 ]; then
+	info "installing"
+	(cd "$REPO_ROOT" && make install)
+fi
+
+printf '\n'
+info "done: decompiled + patched ($STAGES) + built in $REPO_ROOT"
+if [ "$INSTALL" != 1 ]; then
+	printf '    next: (sudo) make install\n'
+fi
+case " $STAGES " in
+*" fixes "*) ;;
+*) printf '    1:1 build: no behaviour fixes applied - add them with --fixes (or `make fixes` in an existing tree)\n' ;;
+esac

@@ -1,0 +1,27 @@
+# WebManager: report the network as available without Android's ConnectivityManager.
+#
+# The original asks Android for the active network. The Linux build has no such
+# API (the Android.Net using is dropped), so assume online; a real
+# NetworkInterface-based check can replace this later. Note the method is called
+# from the game loop, so it must stay cheap.
+#
+--- a/decompiled/src/Survivalcraft/Game/WebManager.cs
++++ b/decompiled/src/Survivalcraft/Game/WebManager.cs
+@@ -5,7 +5,6 @@
+ using System.Net.Http;
+ using System.Text;
+ using System.Threading.Tasks;
+-using Android.Net;
+ using Engine;
+ using SimpleJson;
+ 
+@@ -59,7 +58,8 @@
+ 	{
+ 		try
+ 		{
+-			return ((ConnectivityManager)Window.Activity.GetSystemService("connectivity")).ActiveNetworkInfo?.IsConnected ?? false;
++			// Linux port: assume online; real reachability check (NetworkInterface) can be added later.
++			return true;
+ 		}
+ 		catch (Exception e)
+ 		{
